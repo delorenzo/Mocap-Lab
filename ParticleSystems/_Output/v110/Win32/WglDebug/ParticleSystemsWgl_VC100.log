@@ -1,0 +1,20 @@
+﻿Build started 2/8/2013 3:36:53 PM.
+     1>Project "C:\GeometricTools\WildMagic5\SampleGraphics\ParticleSystems\ParticleSystemsWgl_VC100.vcxproj" on node 3 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /I..\..\SDK\Include /ZI /nologo /W4 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D WM5_USE_OPENGL /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"_Output\v110\Win32\WglDebug\\" /Fd"_Output\v110\Win32\WglDebug\ParticleSystems.pdb" /Gd /TP /analyze- /errorReport:prompt BloodCellController.cpp Bones.cpp
+         Bones.cpp
+     1>c:\geometrictools\wildmagic5\samplegraphics\particlesystems\bones.cpp(12): error C2653: 'ParticleSystems' : is not a class or namespace name
+     1>c:\geometrictools\wildmagic5\samplegraphics\particlesystems\bones.cpp(12): error C2065: 'Initialize' : undeclared identifier
+     1>c:\geometrictools\wildmagic5\samplegraphics\particlesystems\bones.cpp(12): error C2065: 'Terminate' : undeclared identifier
+     1>c:\geometrictools\wildmagic5\samplegraphics\particlesystems\bones.cpp(12): error C2248: 'Wm5::WindowApplication::Run' : cannot access protected member declared in class 'Wm5::WindowApplication'
+                 c:\geometrictools\wildmagic5\sdk\include\wm5windowapplication.h(131) : see declaration of 'Wm5::WindowApplication::Run'
+                 c:\geometrictools\wildmagic5\sdk\include\wm5windowapplication.h(17) : see declaration of 'Wm5::WindowApplication'
+     1>c:\geometrictools\wildmagic5\samplegraphics\particlesystems\bones.cpp(12): error C2065: 'TheApplication' : undeclared identifier
+     1>c:\geometrictools\wildmagic5\samplegraphics\particlesystems\bones.cpp(12): error C2061: syntax error : identifier 'ParticleSystems'
+         BloodCellController.cpp
+         Generating Code...
+     1>Done Building Project "C:\GeometricTools\WildMagic5\SampleGraphics\ParticleSystems\ParticleSystemsWgl_VC100.vcxproj" (Build target(s)) -- FAILED.
+
+Build FAILED.
+
+Time Elapsed 00:00:18.09

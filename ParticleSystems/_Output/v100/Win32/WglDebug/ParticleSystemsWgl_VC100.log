@@ -1,0 +1,27 @@
+﻿Build started 2/22/2013 3:38:02 PM.
+     1>Project "C:\GeometricTools\WildMagic5\SampleGraphics\ParticleSystems\ParticleSystemsWgl_VC100.vcxproj" on node 4 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /I..\..\SDK\Include /ZI /nologo /W4 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D WM5_USE_OPENGL /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"_Output\v100\Win32\WglDebug\\" /Fd"_Output\v100\Win32\WglDebug\Skeleton.pdb" /Gd /TP /analyze- /errorReport:prompt Bone.cpp Skeleton.cpp
+         Skeleton.cpp
+     1>c:\geometrictools\wildmagic5\samplegraphics\particlesystems\skeleton.h(25): error C2146: syntax error : missing ';' before identifier 'h'
+     1>c:\geometrictools\wildmagic5\samplegraphics\particlesystems\skeleton.h(25): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
+     1>c:\geometrictools\wildmagic5\samplegraphics\particlesystems\skeleton.cpp(70): error C2039: 'draw_skel' : is not a member of 'Skeleton'
+                 c:\geometrictools\wildmagic5\samplegraphics\particlesystems\skeleton.h(15) : see declaration of 'Skeleton'
+     1>c:\geometrictools\wildmagic5\samplegraphics\particlesystems\skeleton.cpp(99): error C2065: 'h' : undeclared identifier
+     1>c:\geometrictools\wildmagic5\samplegraphics\particlesystems\skeleton.cpp(99): error C2228: left of '.addchild' must have class/struct/union
+                 type is ''unknown-type''
+     1>c:\geometrictools\wildmagic5\samplegraphics\particlesystems\skeleton.cpp(99): error C2065: 'root' : undeclared identifier
+     1>c:\geometrictools\wildmagic5\samplegraphics\particlesystems\skeleton.cpp(118): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\geometrictools\wildmagic5\samplegraphics\particlesystems\skeleton.cpp(122): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\geometrictools\wildmagic5\samplegraphics\particlesystems\skeleton.cpp(139): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
+     1>c:\geometrictools\wildmagic5\samplegraphics\particlesystems\skeleton.cpp(140): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
+         Bone.cpp
+     1>c:\geometrictools\wildmagic5\samplegraphics\particlesystems\bone.cpp(18): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 c:\program files (x86)\microsoft visual studio 11.0\vc\include\string.h(110) : see declaration of 'strcpy'
+     1>c:\geometrictools\wildmagic5\samplegraphics\particlesystems\bone.cpp(21): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
+         Generating Code...
+     1>Done Building Project "C:\GeometricTools\WildMagic5\SampleGraphics\ParticleSystems\ParticleSystemsWgl_VC100.vcxproj" (Build target(s)) -- FAILED.
+
+Build FAILED.
+
+Time Elapsed 00:00:06.04
