@@ -5,7 +5,7 @@ class Hierarchy
 {
 public:
 	Hierarchy(void);
-	virtual void addchild(Bone p, Bone c);
+	void addchild(Bone p, Bone c);
 protected:
 	Bone* root;
 };

@@ -8,6 +8,7 @@
 
 #ifndef SKELETON_H
 #define SKELETON_H
+#include "Hierarchy.h"
 
 #include "Wm5WindowApplication3.h"
 using namespace Wm5;
@@ -20,22 +21,25 @@ class Skeleton : public WindowApplication3
 public:
     Skeleton ();
 	//char * buffer files for the ASF files
-	char * asf1;
-	char * asf2;
-	Hierarchy h;
+	std::string source;
+	Hierarchy *h;
 	
 	//functions
-    virtual bool OnInitialize ();
-    virtual void OnTerminate ();
-    virtual void OnIdle ();
-    virtual bool OnKeyDown (unsigned char key, int x, int y);
-	virtual bool read_buf (char *name, char *src);
-	virtual void parse_asf(char *source);
+    bool OnInitialize ();
+    void OnTerminate ();
+    void OnIdle ();
+    bool OnKeyDown (unsigned char key, int x, int y);
+	std::string get_file_contents(const char *filename);
+	void parse_asf(std::string source, std::vector<Bone> &b);
+	void draw_skel();
+	void parse_hierarchy(std::string source, std::map<std::string, Node*> n, std::map<std::string, Bone> b);
+	std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems);
+	std::vector<std::string> split(const std::string &s, char delim);
 
 	TriMeshPtr *sm;
 
 protected:
-    void CreateScene ();
+    
 
     NodePtr mScene;
     WireStatePtr mWireState;

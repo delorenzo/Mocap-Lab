@@ -8,14 +8,17 @@
 
 #include "Bone.h"
 #include <stdio.h>
-#include <string.h>
+#include <string>
 
+Bone::Bone() 
+{
 
+}
 //----------------------------------------------------------------------------
-Bone::Bone (int theid, char* thename, float thedirection[3], float* thelength, int theaxis[3], int thedof[3], float thelimits[3][2])
+Bone::Bone (int theid, std::string thename, float thedirection[3], float* thelength, int theaxis[3], int thedof[3], float thelimits[3][2])
 {
 	id = theid;
-	strcpy(name, thename);
+	name = thename;
 	for (int i = 0; i < 3; i++) {
 		dir[i] = thedirection[i];
 		axis[i] = theaxis[i];

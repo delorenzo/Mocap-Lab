@@ -6,7 +6,7 @@ class Node
 {
 
 public:
-
+	int data;
 
 protected:
 
