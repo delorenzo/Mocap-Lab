@@ -1,19 +1,17 @@
-// Geometric Tools, LLC
-// Copyright (c) 1998-2012
-// Distributed under the Boost Software License, Version 1.0.
-// http://www.boost.org/LICENSE_1_0.txt
-// http://www.geometrictools.com/License/Boost/LICENSE_1_0.txt
-//
-// File Version: 5.0.0 (2010/01/01)
+//Julie De Lorenzo
+//2-27-13
+//Never ever use WildMagic for anything.  Please with God as my witness just walk away
 
 #include "Bone.h"
 #include "Skeleton.h"
-#include "Hierarchy.h"
+#include "Keyframe.h"
 #include <fstream>
 #include <string>
 #include <cerrno>
 #include <iostream>
 #include <sstream>
+#include "Wm5WindowApplication3.h"
+
 using namespace std;
 
 WM5_WINDOW_APPLICATION(Skeleton);
@@ -36,7 +34,7 @@ bool Skeleton::OnInitialize ()
 
 	mScene = new0 Node(); //set up scene
 
-	//grab the file into a string buffer
+	//grab the ASF file into a string buffer
 	source = get_file_contents("asf1.txt");
 
 	//parse into the correct data structures
@@ -55,9 +53,19 @@ bool Skeleton::OnInitialize ()
 	//parse the hierarchy and rotate the bones according to the hierarchy, using the bone and node hashmap
 	parse_hierarchy(source, nodemap, bonemap);
 	
+	//grab the AMC files into two string buffers
+	AMC = get_file_contents("02_01.amc");
+	AMC2 = get_file_contents("17_06.amc");
+
+	//Now we want to parse the AMC files!
+	//Parse this data into individual frames (from root to left toe) for the entire buffer.
+	//Store this data EXACTLY how it needs to be used in the animation.  Use atof, multiplying the the angles by Mathf::DEG_TO_RAD
+	std::map<std::string, Float3> keyframe_data;
+	parse_amc(AMC, keyframe_data);
+
     // Set up the camera.
     mCamera->SetFrustum(60.0f, GetAspectRatio(), 1.0f, 1000.0f);
-    APoint camPosition(4.0f, 0.0f, 0.0f);
+    APoint camPosition(26.73f, 0.0f, 0.0f);
     AVector camDVector(-1.0f, 0.0f, 0.0f);
     AVector camUVector(0.0f, 0.0f, 1.0f);
     AVector camRVector = camDVector.Cross(camUVector);
@@ -76,7 +84,34 @@ bool Skeleton::OnInitialize ()
     return true;
 }
 //----------------------------------------------------------------------------
-void Skeleton::draw_skel() {
+void Skeleton::parse_amc(string source, map<std::string, Float3> keyframe)
+{
+	//we want a stringstream and a line buffer because we're going to parse line by line
+	std::istringstream f(source);
+	std::string line;
+	//get the string file down to where the good stuff starts 
+	while(getline(f,line)) {
+		if (line == ":DEGREES") {
+			std::getline(f, line);
+			break;
+		}
+	}
+	//now we start really parsing
+	while(getline(f,line)) {
+
+		//we want to separate (by spaces) the line into tokens
+		std::string buf;
+		stringstream ss(line); 
+		vector<string> tokens;
+		while (ss >> buf) {
+			tokens.push_back(buf); 
+		}
+
+		//go through the tokens
+		for (int i = 0; i < tokens.size(); i++) {
+			std::map<int, Keyframe> keyframe_map;
+		}
+	}
 
 }
 
@@ -124,7 +159,7 @@ void Skeleton::parse_hierarchy(std::string source, std::map<std::string, Node*> 
 			n[tokens[i]] = child; //add child to map
 			
 			//draw the bone
-			TriMesh * ptr = sm.Cylinder(10, 10, 0.05, 2, false);
+			TriMesh * ptr = sm.Cylinder(10, 10, 0.1, 1, false);
 			Bone bone = b[tokens[i]];
 
 			//scale the cylinder
@@ -146,7 +181,7 @@ void Skeleton::parse_hierarchy(std::string source, std::map<std::string, Node*> 
 			AVector crossproduct = z.Cross(dir); //cross product of direction of the bone and the Z axis (new axis)
 			float deg = Mathf::ACos(z.Dot(dir)); //degrees between Z axis and the direction of the bone
 
-			//so we need to rotate the cylinder along the crossproduct axis by deg (dot of Z, dir)
+			//Step #2: rotate the cylinder along the crossproduct axis by deg (dot of Z, dir)
 			rotate.MakeRotation(crossproduct,deg);
 			ptr->LocalTransform.SetRotate(rotate * cur_matrix);
 
@@ -155,7 +190,7 @@ void Skeleton::parse_hierarchy(std::string source, std::map<std::string, Node*> 
 			APoint parent_dir; 
 			Bone parentbone = b[parent]; //the node's parent bone
 			if (parent == "root") {
-				//there's no bone data
+				//there's no bone data for the parent
 			}
 
 			else {
@@ -172,7 +207,7 @@ void Skeleton::parse_hierarchy(std::string source, std::map<std::string, Node*> 
 
 			//translate the child node
 			child->LocalTransform.SetTranslate(parent_dir);
-
+			ptr->SetEffectInstance(Texture2DEffect::CreateUniqueInstance(texture, Shader::SF_LINEAR, Shader::SC_CLAMP_EDGE, Shader::SC_CLAMP_EDGE));
 			//attach the Node to the bone
 			child->AttachChild(ptr);
 			
@@ -247,14 +282,21 @@ void Skeleton::parse_asf(std::string source, std::vector<Bone> &bones) {
 				if (tokens[i] == "dof") {
 					i++;
 					token = tokens[i];
-					while (tokens[i] == "limits") {
+					if (tokens[i] == "limits") {
 						i++;
-						if (tokens[i] == "rx") { dof[0] = 1;}
-						i++;
-						if (tokens[i] == "ry") { dof[1] = 1;}
-						i++;
-						if (tokens[i] == "rz") { dof[2] = 1;}
-						i++;
+						if (tokens[i] == "rx") { 
+							dof[0] = 1;
+							i++;
+						}
+						if (tokens[i] == "ry") { 
+							dof[1] = 1;
+							i++;
+						}
+						if (tokens[i] == "rz") { 
+							dof[2] = 1;
+							i++;
+						}
+						
 					}
 					for (int j = 0; j < 3; j++) {
 						if (dof[j] == 1) {
@@ -305,7 +347,7 @@ void Skeleton::OnTerminate ()
 //----------------------------------------------------------------------------
 void Skeleton::OnIdle ()
 {
-	/*
+	
     MeasureTime();
 
     MoveCamera();
@@ -323,7 +365,7 @@ void Skeleton::OnIdle ()
     }
 
     UpdateFrameCount();
-	*/
+	
 }
 //----------------------------------------------------------------------------
 bool Skeleton::OnKeyDown (unsigned char key, int x, int y)

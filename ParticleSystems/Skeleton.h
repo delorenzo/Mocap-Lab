@@ -1,16 +1,12 @@
-// Geometric Tools, LLC
-// Copyright (c) 1998-2012
-// Distributed under the Boost Software License, Version 1.0.
-// http://www.boost.org/LICENSE_1_0.txt
-// http://www.geometrictools.com/License/Boost/LICENSE_1_0.txt
-//
-// File Version: 5.0.0 (2010/01/01)
+//Julie De Lorenzo
+//2-27-13
 
 #ifndef SKELETON_H
 #define SKELETON_H
-#include "Hierarchy.h"
-
+#include "Bone.h"
+#include "Keyframe.h"
 #include "Wm5WindowApplication3.h"
+
 using namespace Wm5;
 
 class Skeleton : public WindowApplication3
@@ -21,9 +17,7 @@ class Skeleton : public WindowApplication3
 public:
     Skeleton ();
 	//char * buffer files for the ASF files
-	std::string source;
-	Hierarchy *h;
-	
+	std::string source, AMC, AMC2;
 	//functions
     bool OnInitialize ();
     void OnTerminate ();
@@ -31,11 +25,10 @@ public:
     bool OnKeyDown (unsigned char key, int x, int y);
 	std::string get_file_contents(const char *filename);
 	void parse_asf(std::string source, std::vector<Bone> &b);
-	void draw_skel();
 	void parse_hierarchy(std::string source, std::map<std::string, Node*> n, std::map<std::string, Bone> b);
 	std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems);
 	std::vector<std::string> split(const std::string &s, char delim);
-
+	void parse_amc(std::string source, std::map<std::string, Float3> keyframe);
 	TriMeshPtr *sm;
 
 protected:

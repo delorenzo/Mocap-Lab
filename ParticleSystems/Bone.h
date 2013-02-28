@@ -1,4 +1,5 @@
-//Julie De Lorenzo 2/13
+//Julie De Lorenzo
+//2-27-13
 
 #ifndef BONE_H
 #define BONE_H
