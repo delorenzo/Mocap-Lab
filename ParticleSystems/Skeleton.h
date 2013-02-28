@@ -6,6 +6,7 @@
 #include "Bone.h"
 #include "Keyframe.h"
 #include "Wm5WindowApplication3.h"
+#include <string>
 
 using namespace Wm5;
 
@@ -28,7 +29,7 @@ public:
 	void parse_hierarchy(std::string source, std::map<std::string, Node*> n, std::map<std::string, Bone> b);
 	std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems);
 	std::vector<std::string> split(const std::string &s, char delim);
-	void parse_amc(std::string source, std::map<std::string, Float3> keyframe);
+	void parse_amc(std::string source, std::map<int, Keyframe> keyframe_map, std::map<std::string, Bone> bone_data);
 	TriMeshPtr *sm;
 
 protected:

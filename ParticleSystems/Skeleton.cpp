@@ -11,6 +11,9 @@
 #include <iostream>
 #include <sstream>
 #include "Wm5WindowApplication3.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
 
 using namespace std;
 
@@ -25,6 +28,8 @@ Skeleton::Skeleton ()
 {
 }
 //----------------------------------------------------------------------------
+//Function:  OnInitialize()
+//Does:  sets up the scene, grabs the files into buffers, parses those files, then sets up the camera
 bool Skeleton::OnInitialize ()
 {
     if (!WindowApplication3::OnInitialize())
@@ -60,8 +65,8 @@ bool Skeleton::OnInitialize ()
 	//Now we want to parse the AMC files!
 	//Parse this data into individual frames (from root to left toe) for the entire buffer.
 	//Store this data EXACTLY how it needs to be used in the animation.  Use atof, multiplying the the angles by Mathf::DEG_TO_RAD
-	std::map<std::string, Float3> keyframe_data;
-	parse_amc(AMC, keyframe_data);
+	std::map<int, Keyframe> keyframe_data;
+	parse_amc(AMC, keyframe_data, bonemap);
 
     // Set up the camera.
     mCamera->SetFrustum(60.0f, GetAspectRatio(), 1.0f, 1000.0f);
@@ -84,7 +89,9 @@ bool Skeleton::OnInitialize ()
     return true;
 }
 //----------------------------------------------------------------------------
-void Skeleton::parse_amc(string source, map<std::string, Float3> keyframe)
+//Function: parse_amc
+//Does:  Parses the AMC data from a std::string buffer and places it in a std::map of keyframes (which itself is a std::map of Nodes)
+void Skeleton::parse_amc(std::string source, std::map<int, Keyframe> keyframe_map, std::map<std::string, Bone> bone_data)
 {
 	//we want a stringstream and a line buffer because we're going to parse line by line
 	std::istringstream f(source);
@@ -97,6 +104,7 @@ void Skeleton::parse_amc(string source, map<std::string, Float3> keyframe)
 		}
 	}
 	//now we start really parsing
+	int index = 1;
 	while(getline(f,line)) {
 
 		//we want to separate (by spaces) the line into tokens
@@ -107,15 +115,56 @@ void Skeleton::parse_amc(string source, map<std::string, Float3> keyframe)
 			tokens.push_back(buf); 
 		}
 
+		
 		//go through the tokens
-		for (int i = 0; i < tokens.size(); i++) {
-			std::map<int, Keyframe> keyframe_map;
+		Float3 a_float, root_transf; //this controls the rotation
+		std::map<std::string, Float3> n; 
+		int i = 1;
+
+		//check if the first char is an integer value
+		if (isdigit(tokens[0].front())) {
+			index++; //increment index of the keyframe map
 		}
+
+		//check for the root case
+		else if (tokens[0] == "root") {
+			for (int i = 1; i < tokens.size()-1; i++) {
+				for (int k = 1; k < 4; k++) {
+					root_transf[k] = atof(tokens[k].c_str());
+				}
+
+				for (int j = 4; j < 7; j++) {
+					a_float[j] = atof(tokens[0].c_str());
+				}
+				n["root"] = a_float;
+			}
+		}
+
+		//read in the values for the rotation
+		else {
+			if (bone_data[tokens[0]].dof[0] == 1) { 
+				a_float[0] = atof(tokens[i].c_str());
+				i++;
+			}
+			if (bone_data[tokens[0]].dof[1] == 1) {
+				a_float[1] = atof(tokens[i].c_str());
+				i++;
+			}
+			if (bone_data[tokens[0]].dof[2] == 1) {
+				a_float[2] = atof(tokens[i].c_str());
+			}
+			n[tokens[0]] = a_float;
+		}
+		
 	}
 
 }
 
+
 //----------------------------------------------------------------------------
+//Function:  parse_hierarchy
+//Does:  parses the hierarchy from a std::string, performs the necessary transformations on the bone data from a map,
+//then sticks the hierarchy data (bone data + child information) in the appropriate map
 void Skeleton::parse_hierarchy(std::string source, std::map<std::string, Node*> n, std::map<std::string, Bone> b) {
 	mWireState = new0 WireState();
 	mRenderer->SetOverrideWireState(mWireState);
@@ -134,24 +183,35 @@ void Skeleton::parse_hierarchy(std::string source, std::map<std::string, Node*> 
 
     //mRectangle->SetEffectInstance(geomEffect->CreateInstance(texture));
 
-	n["root"] = root;
+	n["root"] = root; //add the root to the map
+
+	//we want to parse line by line
 	std::istringstream f(source);
 	std::string line;
+	//we want to skip down to wear the hierarchy starts
 	while (std::getline(f, line)) {
 		if (line == ":hierarchy") {
-			std::getline(f, line);
+			std::getline(f, line); //this skips out of the hierarchy
 			break;
 		}
 	}
-	std::getline(f, line);
-	while (line != "  end") {
-		std::string buf;
+
+	std::getline(f, line); //this skips out of the "begin"
+
+	//now for serious parsing time
+	while (line != "  end") { //until we hit end
+
+		//we want to space-separate the line and parse through each token
+		std::string buf; //buffer
 		stringstream ss(line);
-		vector<string> tokens;
+		vector<string> tokens; //holds tokens
+		//add the tokens
 		while (ss >> buf) {
 			tokens.push_back(buf);
 		}
-		std::string parent = tokens[0];
+
+		//put the data in the map from the tokens
+		std::string parent = tokens[0]; ///the parent is always the first token
 		for (int i = 1; i < tokens.size(); i++) {
 			Node * cur = n[parent];   //parent
 			Node * child = new0 Node(); //child
@@ -217,6 +277,8 @@ void Skeleton::parse_hierarchy(std::string source, std::map<std::string, Node*> 
 	mScene->AttachChild(root);
 }
 //----------------------------------------------------------------------------
+//Function: parse_asf
+//Parses the asf file from a std::string and spits it out as a std::vector of bones
 void Skeleton::parse_asf(std::string source, std::vector<Bone> &bones) {
 
 	std::string buf; //string buffer
@@ -319,8 +381,9 @@ void Skeleton::parse_asf(std::string source, std::vector<Bone> &bones) {
 	} while (i < tokens.size());
 }
 
-
-
+//----------------------------------------------------------------------------
+//Function: get_file_contents
+//Gets the file and returns it as a std::string buffer
 std::string Skeleton::get_file_contents(const char *filename)
 {
 	 std::ifstream in(filename, std::ios::in | std::ios::binary);
@@ -337,6 +400,8 @@ std::string Skeleton::get_file_contents(const char *filename)
 	 throw(errno);
 }
 //----------------------------------------------------------------------------
+//Function:  OnTerminate()
+//Handles termination of the program
 void Skeleton::OnTerminate ()
 {
     mScene = 0;
@@ -345,6 +410,8 @@ void Skeleton::OnTerminate ()
     WindowApplication3::OnTerminate();
 }
 //----------------------------------------------------------------------------
+//Function:  OnIdle()
+//Handles idle behavior
 void Skeleton::OnIdle ()
 {
 	
@@ -368,6 +435,8 @@ void Skeleton::OnIdle ()
 	
 }
 //----------------------------------------------------------------------------
+//Function: OnKeyDown
+//This handles key presses (just switches from wire state to not for now)
 bool Skeleton::OnKeyDown (unsigned char key, int x, int y)
 {
     if (WindowApplication3::OnKeyDown(key, x, y))

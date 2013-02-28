@@ -15,7 +15,7 @@ public:
 	Keyframe();
 	std::map<std::string, Node*> node_map;
 	APoint * root_translation;
-	Keyframe(std::map<std::string, Node*> the_node_map);
+	Keyframe(std::map<std::string, Float3*> the_node_map);
 	~Keyframe(void);
 };
 
