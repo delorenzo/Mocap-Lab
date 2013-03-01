@@ -8,6 +8,11 @@
 #include "Wm5WindowApplication3.h"
 #include <string>
 
+#define X 0
+#define Y 1
+#define Z 2
+
+
 using namespace Wm5;
 
 class Skeleton : public WindowApplication3
@@ -16,7 +21,20 @@ class Skeleton : public WindowApplication3
     WM5_DECLARE_TERMINATE;
 
 public:
+
     Skeleton ();
+
+	//data structures for bones, nodes, keyframe
+	std::map<std::string, Bone> bonemap;
+	std::map<int, Keyframe> keyframe_data;
+	std::map<std::string, Node*> nodemap;
+
+	APoint* root_transf;
+	APoint* root_rot;
+
+	//steps for slowly animating the skeleton (debugging)
+	int step;
+
 	//char * buffer files for the ASF files
 	std::string source, AMC, AMC2;
 	//functions
@@ -26,10 +44,16 @@ public:
     bool OnKeyDown (unsigned char key, int x, int y);
 	std::string get_file_contents(const char *filename);
 	void parse_asf(std::string source, std::vector<Bone> &b);
-	void parse_hierarchy(std::string source, std::map<std::string, Node*> n, std::map<std::string, Bone> b);
+	void parse_hierarchy(std::string source);
 	std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems);
 	std::vector<std::string> split(const std::string &s, char delim);
-	void parse_amc(std::string source, std::map<int, Keyframe> keyframe_map, std::map<std::string, Bone> bone_data);
+	void parse_amc(std::string source);
+	void animate_skele(int step);
+
+	HMatrix rotation(float deg, int axis) ;
+	HMatrix rotation_x(float deg);
+	HMatrix rotation_y(float deg);
+	HMatrix rotation_z(float deg);
 	TriMeshPtr *sm;
 
 protected:

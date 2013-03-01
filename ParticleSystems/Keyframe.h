@@ -13,9 +13,10 @@ class Keyframe
 {
 public:
 	Keyframe();
-	std::map<std::string, Node*> node_map;
-	APoint * root_translation;
-	Keyframe(std::map<std::string, Float3*> the_node_map);
+	std::map<std::string, HMatrix> matrix_map;
+	APoint root_translation;
+	APoint root_rotation;
+	Keyframe(std::map<std::string, HMatrix> matrix_map);
 	~Keyframe(void);
 };
 
