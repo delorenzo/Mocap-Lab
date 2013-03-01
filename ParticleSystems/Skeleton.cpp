@@ -122,6 +122,7 @@ void Skeleton::parse_amc(std::string source)
 		}
 
 		APoint root_transf; //declare root transformation information
+		APoint root_rot;
 		//go through the tokens
 		Float3 a_float; //this controls the rotation
 		HMatrix rot_matrix = HMatrix::IDENTITY; //matrix to store final rotation information
@@ -145,11 +146,10 @@ void Skeleton::parse_amc(std::string source)
 			}
 
 			for (int j = 0; j < 3; j++) {
-				a_float[j] = Mathf::DEG_TO_RAD * atof(tokens[3+j].c_str());
+				root_rot[j] = Mathf::DEG_TO_RAD * atof(tokens[3+j].c_str());
 			}
 			frame.root_translation = root_transf;
-			frame.root_rotation = APoint(a_float);
-				
+			frame.root_rotation = root_rot;
 			
 		}
 
@@ -197,6 +197,7 @@ void Skeleton::parse_amc(std::string source)
 //Does:  parses the hierarchy from a std::string, performs the necessary transformations on the bone data from a map,
 //then sticks the hierarchy data (bone data + child information) in the appropriate map
 void Skeleton::parse_hierarchy(std::string source) {
+	//skeleton drawing stuff
 	mWireState = new0 WireState();
 	mRenderer->SetOverrideWireState(mWireState);
 	Node * root = new0 Node();
@@ -205,7 +206,6 @@ void Skeleton::parse_hierarchy(std::string source) {
         VertexFormat::AU_POSITION, VertexFormat::AT_FLOAT3, 0,
         VertexFormat::AU_TEXCOORD, VertexFormat::AT_FLOAT2, 0);
     int vstride = vformat->GetStride();
-
 	StandardMesh sm(vformat);
 
 	std::string path = Environment::GetPathR("RedSky.wmtf");
@@ -495,6 +495,24 @@ bool Skeleton::OnKeyDown (unsigned char key, int x, int y)
 
     switch (key)
     {
+
+	case '0': { //reset
+
+			  }
+	case '1': { //display subject 1
+
+			  }
+	case '2': { //animate subject 1
+
+
+			  }
+	case '3': { //display and animate subject 2
+
+			  }
+	case '4':  { //display and animate subject 1 & 2
+
+
+			   }
 	case 'n': {
 		
 		animate_skele(step);
@@ -521,13 +539,17 @@ void Skeleton::animate_skele(int step)
 	//Step #1:  Apply transformation information of the root
 	//(This took like 3 hours)
 	Keyframe frame = keyframe_data[step];
-	//nodemap["root"]->LocalTransform.SetTranslate(frame.root_translation);
+	nodemap["root"]->LocalTransform.SetTranslate(frame.root_translation);
 
 	//define local axis transformation L
 	//(this never worked - sorry not sorry) #YOLO
-	HMatrix L;
-	HMatrix L_inverse;
-	for (std::map<std::string, Bone>::iterator it=bonemap.begin(); it!=bonemap.end(); ++it) {
+
+	for (std::map<std::string, HMatrix>::iterator it=frame.matrix_map.begin(); it!=frame.matrix_map.end(); ++it) {
+		if (it->first == "root") { continue;} //don't fuck with root! 
+		
+		HMatrix L;
+		HMatrix L_inverse;
+
 		float deg = Mathf::DEG_TO_RAD * bonemap[it->first].axis[0];
 		L = rotation(deg, X);
 		deg = Mathf::DEG_TO_RAD * bonemap[it->first].axis[1];
@@ -535,14 +557,14 @@ void Skeleton::animate_skele(int step)
 		deg = Mathf::DEG_TO_RAD * bonemap[it->first].axis[2];
 		L = L * rotation (deg, Z);
 
-		L_inverse = L.Transpose(); //definse L inverse
+		L_inverse = L.Inverse(); //definse L inverse
 		HMatrix rot = frame.matrix_map[it->first];
 		HMatrix final = L_inverse * rot * L;
 		nodemap[it->first]->LocalTransform.SetRotate(final);
 
 	}
 
-
+	printf("WildMagic is a pizza burn on the roof of the mouth of the world.");
 }
 
 /*******************************************************

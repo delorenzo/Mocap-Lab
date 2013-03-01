@@ -29,6 +29,10 @@ public:
 	std::map<int, Keyframe> keyframe_data;
 	std::map<std::string, Node*> nodemap;
 
+	std::map<std::string, Bone> bonemap_2;
+	std::map<int, Keyframe> keyframe_data_2;
+	std::map<std::string, Node*> nodemap_2;
+
 	APoint* root_transf;
 	APoint* root_rot;
 
