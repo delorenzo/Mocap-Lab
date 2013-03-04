@@ -23,24 +23,29 @@ class Skeleton : public WindowApplication3
 public:
 
     Skeleton ();
-
+	int cur_subject;
+	int animate_on;
 	//data structures for bones, nodes, keyframe
 	std::map<std::string, Bone> bonemap;
 	std::map<int, Keyframe> keyframe_data;
+	int keyframe_steps;
 	std::map<std::string, Node*> nodemap;
 
-	std::map<std::string, Bone> bonemap_2;
-	std::map<int, Keyframe> keyframe_data_2;
-	std::map<std::string, Node*> nodemap_2;
+	std::map<std::string, Bone> bonemap2;
+	std::map<int, Keyframe> keyframe_data2;
+	int keyframe_steps2;
+	std::map<std::string, Node*> nodemap2;
+
 
 	APoint* root_transf;
 	APoint* root_rot;
 
 	//steps for slowly animating the skeleton (debugging)
 	int step;
+	int step2;
 
 	//char * buffer files for the ASF files
-	std::string source, AMC, AMC2;
+	std::string s, s2, AMC, AMC2;
 	//functions
     bool OnInitialize ();
     void OnTerminate ();
@@ -49,10 +54,13 @@ public:
 	std::string get_file_contents(const char *filename);
 	void parse_asf(std::string source, std::vector<Bone> &b);
 	void parse_hierarchy(std::string source);
+	void parse_hierarchy2(std::string source);
 	std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems);
 	std::vector<std::string> split(const std::string &s, char delim);
 	void parse_amc(std::string source);
+	void parse_amc2(std::string source);
 	void animate_skele(int step);
+	void animate_skele2(int step);
 
 	HMatrix rotation(float deg, int axis) ;
 	HMatrix rotation_x(float deg);
